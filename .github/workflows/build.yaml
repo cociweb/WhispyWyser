@@ -83,4 +83,3 @@ jobs:
             ghcr.io/${{ env.REPO_LC }}_${{ matrix.arch }}-${{ matrix.base_type }}
             ghcr.io/${{ env.REPO_LC }}_${{ matrix.arch }}-${{ matrix.base_type }}:latest
           push: ${{ env.PUSH_IMAGE == 'true' }}
-          load: ${{ env.PUSH_IMAGE != 'true' }}
