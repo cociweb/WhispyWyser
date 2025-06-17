@@ -37,7 +37,9 @@ jobs:
             base_type: cpu
 
     steps:
-
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Login to GitHub Container Registry
         if: env.PUSH_IMAGE == 'true'
         uses: docker/login-action@v3
