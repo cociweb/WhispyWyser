@@ -62,7 +62,7 @@ jobs:
         run: |
           # Default: do not push
           PUSH_IMAGE=false
-          if [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "refs/heads/main" || "${{ github.ref_name }}" =~  '^([vV]?\d+\.\d+\.\d+)$') ) ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.ref_name }}" == "refs/heads/main" ]]; then
+          if [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "refs/heads/main" || "${{ github.ref_type }}" ==  "tag" ) ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.ref_name }}" == "refs/heads/main" ]]; then
             echo "PUSH_IMAGE=true" >> $GITHUB_ENV
           else
             echo "PUSH_IMAGE=false" >> $GITHUB_ENV
