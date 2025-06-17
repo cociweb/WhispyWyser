@@ -65,6 +65,9 @@ jobs:
             echo "PUSH_IMAGE=false" >> $GITHUB_ENV
           fi
 
+      - name: Set lowercase repository name
+        run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       - name: Build and (optionally) push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -76,7 +79,7 @@ jobs:
             ARCHITECTURE=${{ matrix.arch }}
             BASE_TYPE=${{ matrix.base_type }}
           tags: |
-            ghcr.io/${{ github.repository }}_${{ matrix.arch }}-${{ matrix.base_type }}
-            ghcr.io/${{ github.repository }}_${{ matrix.arch }}-${{ matrix.base_type }}:latest
+            ghcr.io/${{ env.REPO_LC }}_${{ matrix.arch }}-${{ matrix.base_type }}
+            ghcr.io/${{ env.REPO_LC }}_${{ matrix.arch }}-${{ matrix.base_type }}:latest
           push: ${{ env.PUSH_IMAGE == 'true' }}
           load: ${{ env.PUSH_IMAGE != 'true' }}
