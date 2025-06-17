@@ -39,8 +39,13 @@ RUN if [ "$BASE_TYPE" = "cuda" ]; then \
     else \
       METADATA_DIR="/usr/local/lib/python3.12/site-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info"; \
     fi && \
+    cd /usr/local/lib/python3.12/ &&\
+    ls -lah && \
+    cd site-packages && \
+    ls -lah && \
     cd "$METADATA_DIR" && \
     ls -lah && \
+    cat METADATA
     sed -i -e 's/wyoming==1.5.3/wyoming>=1.6.1/g' \
        -e 's/faster-whisper==1.1.0/faster-whisper>=1.1.1/g' METADATA
 
