@@ -24,11 +24,11 @@ jobs:
             baseimage: nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04@sha256:f6913f3c02f297877f6859d12ff330043c0be668fdad86868c29a239a5a82151
             base_type: cuda
           - arch: aarch64
-            platform: linux/arm64
+            platform: linux/arm64/v8
             baseimage: nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04@sha256:8e6794c967a86219264f3ef770036fd7da4f6adcdc0d145074dcd61b2405fda4
             base_type: cuda
           - arch: aarch64
-            platform: linux/arm6
+            platform: linux/arm64/v8
             baseimage: arm64v8/python:3.11-slim-bookworm
             base_type: cpu
           - arch: amd64
