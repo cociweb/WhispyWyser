@@ -63,7 +63,7 @@ COPY WhispyWyser/common/docker-entrypoint.sh ./
 #
 #COPY WhispyWyser/common/replacables ./
 
-LABEL org.opencontainers.image.source https://github.com/cociweb/WhispyWyser
+LABEL org.opencontainers.image.source="https://github.com/cociweb/WhispyWyser"
 
 EXPOSE 10300
 ENTRYPOINT ["bash", "/docker-entrypoint.sh"]
