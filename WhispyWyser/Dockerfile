@@ -24,8 +24,8 @@ RUN apt-get update && \
         netcat-traditional; \
     fi
 
-RUN pip3 install --no-cache-dir -U  --upgrade pip
-RUN pip3 install --no-cache-dir -U \
+RUN pip3 install --no-cache-dir --upgrade pip
+RUN pip3 install --no-cache-dir --upgrade \
         setuptools \
         wheel
 
@@ -35,9 +35,9 @@ RUN ls -lah
 RUN pip3 install --no-cache-dir wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.tar.gz
 
 RUN if [ "$BASE_TYPE" = "cuda" ]; then \
-      METADATA_DIR="/usr/local/lib/python3.12/dist-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info"; \
+      METADATA_DIR="/usr/local/lib/python3.10/dist-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info"; \
     else \
-      METADATA_DIR="/usr/local/lib/python3.12/site-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info"; \
+      METADATA_DIR="/usr/local/lib/python3.11/site-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info"; \
     fi && \
     cd "$METADATA_DIR" && \
     ls -lah && \
