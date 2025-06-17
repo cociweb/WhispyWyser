@@ -10,7 +10,8 @@ ENV BASE_TYPE=${BASE_TYPE}
 
 WORKDIR /usr/src
 
-RUN if [ "$BASE_TYPE" = "cuda" ]; then \
+RUN apt-get update && \
+    if [ "$BASE_TYPE" = "cuda" ]; then \
       apt-get install -y --no-install-recommends \
         build-essential \
         python3 \
