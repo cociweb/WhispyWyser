@@ -35,14 +35,17 @@ RUN ls -lah
 RUN pip3 install --no-cache-dir wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.tar.gz
 
 RUN if [ "$BASE_TYPE" = "cuda" ]; then \
-      cd /usr/local/lib/python3.10/dist-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info/; \
+      cd /usr/local/lib/python3.10/dist-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info/ && \
+      ls -lah && \
+      sed -i -e 's/wyoming==1.5.3/wyoming>=1.6.1/g' \
+             -e 's/faster-whisper==1.1.0/faster-whisper>=1.1.1/g' METADATA; \
     else \
-      cd /usr/local/lib/python3.11/site-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info/; \
+      cd /usr/local/lib/python3.11/site-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info/ && \
+      ls -lah && \
+      sed -i -e 's/wyoming==1.5.3/wyoming>=1.6.1/g' \
+             -e 's/faster-whisper==1.1.0/faster-whisper>=1.1.1/g' METADATA; \
     fi
-RUN ls -lah
-RUN sed -i -e 's/wyoming==1.5.3/wyoming>=1.6.1/g' \
-        -e 's/faster-whisper==1.1.0/faster-whisper>=1.1.1/g' \
-        METADATA
+
 RUN pip3 install --no-cache-dir -U --upgrade wyoming faster-whisper
 
 RUN apt-get purge -y --auto-remove build-essential python3-dev
