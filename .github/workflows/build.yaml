@@ -73,7 +73,7 @@ jobs:
       - name: Build and (optionally) push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: WhispyWyser
+          context: .
           file: WhispyWyser/Dockerfile
           platforms: ${{ matrix.platform }}
           build-args: |
