@@ -45,7 +45,7 @@ RUN if [ "$BASE_TYPE" = "cuda" ]; then \
     ls -lah && \
     cd "$METADATA_DIR" && \
     ls -lah && \
-    cat METADATA
+    cat METADATA && \
     sed -i -e 's/wyoming==1.5.3/wyoming>=1.6.1/g' \
        -e 's/faster-whisper==1.1.0/faster-whisper>=1.1.1/g' METADATA
 
