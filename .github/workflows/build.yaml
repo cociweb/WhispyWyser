@@ -71,7 +71,11 @@ jobs:
       - name: Set image name
         run: |
           REPO="${{ github.repository }}"
-          echo "REPO_LC=${REPO,,}" >> $GITHUB_ENV
+          REPO_LC=${REPO,,}
+          REPO_LC_Q="${REPO,,}"
+          echo ${REPO_LC}
+          echo ${REPO_LC_Q}
+          echo "REPO_LC=${REPO_LC}" >> $GITHUB_ENV
           echo "IMAGE_NAME=ghcr.io/${{ env.REPO_LC }}_${{ matrix.arch }}-${{ matrix.base_type }}" >> $GITHUB_ENV
 
       - name: Build and (optionally) push Docker image
