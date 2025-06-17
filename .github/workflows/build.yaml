@@ -37,8 +37,6 @@ jobs:
             base_type: cpu
 
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
         if: env.PUSH_IMAGE == 'true'
@@ -67,29 +65,18 @@ jobs:
             echo "PUSH_IMAGE=false" >> $GITHUB_ENV
           fi
 
-      - name: Build Docker image
-        run: |
-          RAW_IMAGE_NAME="ghcr.io/${{ github.repository }}_${{ matrix.arch }}-${{ matrix.base_type }}"
-          IMAGE_NAME="${RAW_IMAGE_NAME,,}"
-          if [ "$PUSH_IMAGE" = "true" ]; then
-            docker buildx build \
-              --platform ${{ matrix.platform }} \
-              --build-arg BASEIMAGE=${{ matrix.baseimage }} \
-              --build-arg ARCHITECTURE=${{ matrix.arch }} \
-              --build-arg BASE_TYPE=${{ matrix.base_type }} \
-              -f WhispyWyser/Dockerfile \
-              -t $IMAGE_NAME \
-              -t $IMAGE_NAME:latest \
-              --push \
-              .
-          else
-            docker buildx build \
-              --platform ${{ matrix.platform }} \
-              --build-arg BASEIMAGE=${{ matrix.baseimage }} \
-              --build-arg ARCHITECTURE=${{ matrix.arch }} \
-              --build-arg BASE_TYPE=${{ matrix.base_type }} \
-              -f WhispyWyser/Dockerfile \
-              -t $IMAGE_NAME \
-              --load \
-              .
-          fi
+      - name: Build and (optionally) push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: WhispyWyser/Dockerfile
+          platforms: ${{ matrix.platform }}
+          build-args: |
+            BASEIMAGE=${{ matrix.baseimage }}
+            ARCHITECTURE=${{ matrix.arch }}
+            BASE_TYPE=${{ matrix.base_type }}
+          tags: |
+            ghcr.io/${{ github.repository }}_${{ matrix.arch }}-${{ matrix.base_type }}
+            ghcr.io/${{ github.repository }}_${{ matrix.arch }}-${{ matrix.base_type }}:latest
+          push: ${{ env.PUSH_IMAGE == 'true' }}
+          load: ${{ env.PUSH_IMAGE != 'true' }}
