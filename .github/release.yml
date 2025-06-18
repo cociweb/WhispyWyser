@@ -6,7 +6,7 @@ categories:
   - title: "⚠ Breaking Changes"
     labels:
       - "breaking-change"
-  - title: "🚀 Features"
+  - title: "🎉 Features"
     labels:
       - "feature"
       - "enhancement"
@@ -15,7 +15,7 @@ categories:
     labels:
       - "bugfix"
       - "bug"
-  - title: "🧰 Maintenance"
+  - title: "🛠 Maintenance"
     labels:
       - "ci"
       - "documentation"
