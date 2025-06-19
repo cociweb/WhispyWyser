@@ -76,7 +76,7 @@ jobs:
           echo "IMAGE_NAME=ghcr.io/${REPO_LC}_${{ matrix.arch }}-${{ matrix.base_type }}" >> $GITHUB_ENV
 
       - name: Build and (optionally) push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: WhispyWyser/Dockerfile
