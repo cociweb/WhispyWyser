@@ -1,4 +1,4 @@
 
 # whispywyser module
 
-::: whispywyser.whispywyser
+::: whispywyser

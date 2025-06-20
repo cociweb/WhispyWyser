@@ -1,3 +1,3 @@
 # common module
 
-::: whispywyser.common
+::: whispywyser.wfw
