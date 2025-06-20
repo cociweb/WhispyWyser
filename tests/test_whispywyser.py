@@ -5,7 +5,7 @@
 
 import unittest
 
-from whispywyser import whispywyser
+from whispywyser
 
 
 class TestWhispywyser(unittest.TestCase):
