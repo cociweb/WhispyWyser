@@ -32,15 +32,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 RUN pip3 install --no-cache-dir whispywyser
 
-#RUN if [ "$BASE_TYPE" = "cuda" ]; then \
-#      METADATA_DIR="/usr/local/lib/python3.10/dist-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info"; \
-#    else \
-#      METADATA_DIR="/usr/local/lib/python3.11/site-packages/wyoming_faster_whisper-${WYOMING_FASTER_WHISPER_VERSION}.dist-info"; \
-#    fi && \
-#    cd "$METADATA_DIR" && \
-#    ls -lah && \
-#    sed -i -e 's/wyoming==1.5.3/wyoming>=1.6.1/g' \
-#       -e 's/faster-whisper==1.1.0/faster-whisper>=1.1.1/g' METADATA;
 
 RUN pip3 install --no-cache-dir -U --upgrade wyoming faster-whisper
 
@@ -50,14 +41,6 @@ RUN rm -rf /var/lib/apt/lists/*
 WORKDIR /
 COPY build/docker-entrypoint.sh ./
 
-#RUN if [ "$BASE_TYPE" = "cuda" ]; then \
-#      cd /usr/local/lib/python3.10/dist-packages/wyoming_faster_whisper/; \
-#    else \
-#      cd /usr/local/lib/python3.11/site-packages/wyoming_faster_whisper/; \
-#    fi
-#
-#
-#COPY WhispyWyser/common/replacables ./
 
 LABEL org.opencontainers.image.source="https://github.com/cociweb/WhispyWyser"
 
