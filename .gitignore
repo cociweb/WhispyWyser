@@ -10,7 +10,8 @@ private/
 # Distribution / packaging
 .Python
 env/
-build/
+.build/
+#build/
 develop-eggs/
 dist/
 downloads/
