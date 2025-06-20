@@ -1,4 +1,6 @@
-faster-whisper>=1.1.0,<2
+faster-whisper>=1.1.1,<2
+ctranslate2>=4.6.0,<5
 wyoming>=1.6.1,<2
-wyoming-faster-whisper>=2.5.0,<3
+#wyoming-faster-whisper>=2.5.0,<3
 hassil>=3.0.1,<4
+transformers[torch]>=4.52.4,<5

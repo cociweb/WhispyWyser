@@ -79,7 +79,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: WhispyWyser/Dockerfile
+          file: build/Dockerfile
           platforms: ${{ matrix.platform }}
           build-args: |
             BASEIMAGE=${{ matrix.baseimage }}
