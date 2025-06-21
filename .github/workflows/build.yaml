@@ -6,12 +6,16 @@ on:
     branches:
       - '**'
       - '!main'
+      - '!main'
     tags:
       - 'v*.*.*'
       - 'V*.*.*'
       - '*.*.*'
   workflow_dispatch:
   pull_request:
+    branches:
+      - 'main'
+
     branches:
       - 'main'
 
@@ -88,6 +92,7 @@ jobs:
 
   build:
     needs: deploy
+    needs: deploy
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -142,6 +147,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: build/Dockerfile
           file: build/Dockerfile
           platforms: ${{ matrix.platform }}
           build-args: |
