@@ -61,8 +61,26 @@ jobs:
         - name: Build
           run: python -m build
 
+<<<<<<< HEAD
+=======
+        - name: Bump version
+          if: env.PUSH_IMAGE == 'true'
+          id: bump
+          uses: callowayproject/bump-my-version@master
+          env:
+            BUMPVERSION_TAG: "true"
+          with:
+            args: --destination pyproject.toml ${{ inputs.bump-type }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Check
+          if: steps.bump.outputs.bumped == 'true'
+          run: |
+            echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
+
+>>>>>>> 92a94ec (Update build.yaml)
         - name: Publish
-          if: ${{ env.PUSH_IMAGE == 'true' }}
+          if: env.PUSH_IMAGE == 'true'
           env:
               TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
               TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
