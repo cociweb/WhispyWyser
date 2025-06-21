@@ -5,15 +5,71 @@ on:
   push:
     branches:
       - '**'
+      - '!main'
     tags:
       - 'v*.*.*'
       - 'V*.*.*'
       - '*.*.*'
   workflow_dispatch:
   pull_request:
+    branches:
+      - 'main'
+
 
 jobs:
+  decision:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide push or load
+        id: decide
+        run: |
+          # Default: do not push
+          PUSH_IMAGE=false
+          if [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "refs/heads/main" || "${{ github.ref_type }}" ==  "tag" ) ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.ref_name }}" == "refs/heads/main" ]] || [[ "${{ github.event_name }}" == "pull_request" && "${{ github.ref_name }}" == "refs/heads/main" ]]; then
+            echo "PUSH_IMAGE=true" >> $GITHUB_ENV
+          else
+            echo "PUSH_IMAGE=false" >> $GITHUB_ENV
+          fi
+  deploy:
+    needs: decision
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v4
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+              python-version: "3.x"
+        - name: Install dependencies
+          run: |
+              python -m pip install --upgrade pip
+              pip install setuptools wheel twine build
+        - name: Build
+          run: python -m build
+
+        - name: Bump version
+          if: ${{ env.PUSH_IMAGE == 'true' }}
+          id: bump
+          uses: callowayproject/bump-my-version@master
+          env:
+            BUMPVERSION_TAG: "true"
+          with:
+            args: --destination pyproject.toml ${{ inputs.bump-type }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Check
+          if: steps.bump.outputs.bumped == 'true'
+          run: |
+            echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
+
+        - name: Publish
+          if: ${{ env.PUSH_IMAGE == 'true' }}
+          env:
+              TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+              TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          run: twine upload dist/*
+
   build:
+    needs: deploy
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -57,17 +113,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Decide push or load
-        id: decide
-        run: |
-          # Default: do not push
-          PUSH_IMAGE=false
-          if [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "refs/heads/main" || "${{ github.ref_type }}" ==  "tag" ) ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.ref_name }}" == "refs/heads/main" ]]; then
-            echo "PUSH_IMAGE=true" >> $GITHUB_ENV
-          else
-            echo "PUSH_IMAGE=false" >> $GITHUB_ENV
-          fi
-
       - name: Set image name
         run: |
           REPO="${{ github.repository }}"
@@ -79,7 +124,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: WhispyWyser/Dockerfile
+          file: build/Dockerfile
           platforms: ${{ matrix.platform }}
           build-args: |
             BASEIMAGE=${{ matrix.baseimage }}
