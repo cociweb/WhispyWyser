@@ -47,7 +47,7 @@ jobs:
           run: python -m build
 
         - name: Bump version
-          if: ${{ env.PUSH_IMAGE == 'true' }}
+          if: env.PUSH_IMAGE == 'true'
           id: bump
           uses: callowayproject/bump-my-version@master
           env:
@@ -62,7 +62,7 @@ jobs:
             echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
 
         - name: Publish
-          if: ${{ env.PUSH_IMAGE == 'true' }}
+          if: env.PUSH_IMAGE == 'true'
           env:
               TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
               TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
