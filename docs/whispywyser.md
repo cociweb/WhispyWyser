@@ -1,4 +1,3 @@
 
 # whispywyser module
 
-::: whispywyser
