@@ -6,16 +6,12 @@ on:
     branches:
       - '**'
       - '!main'
-      - '!main'
     tags:
       - 'v*.*.*'
       - 'V*.*.*'
       - '*.*.*'
   workflow_dispatch:
   pull_request:
-    branches:
-      - 'main'
-
     branches:
       - 'main'
 
@@ -65,8 +61,6 @@ jobs:
         - name: Build
           run: python -m build
 
-<<<<<<< HEAD
-=======
         - name: Bump version
           if: env.PUSH_IMAGE == 'true'
           id: bump
@@ -82,7 +76,6 @@ jobs:
           run: |
             echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
 
->>>>>>> 92a94ec (Update build.yaml)
         - name: Publish
           if: env.PUSH_IMAGE == 'true'
           env:
@@ -91,7 +84,6 @@ jobs:
           run: twine upload dist/*
 
   build:
-    needs: deploy
     needs: deploy
     runs-on: ubuntu-latest
     permissions:
@@ -147,7 +139,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: build/Dockerfile
           file: build/Dockerfile
           platforms: ${{ matrix.platform }}
           build-args: |
