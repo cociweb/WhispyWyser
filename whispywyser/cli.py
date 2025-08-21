@@ -16,95 +16,174 @@ from wyoming.server import AsyncServer
 
 from . import __version__
 from .wfw.handler import FasterWhisperEventHandler
+from .api import run_api_server
+from .homeassistant.client import HomeAssistantClient
+from .homeassistant.models import Things
+from .spell_checker import JamSpellChecker
+from .wyoming import WyomingService
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def main() -> None:
-    """Main entry point."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
+def parse_args() -> argparse.Namespace:
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(prog="whispywyser")
+    
+    # Sub-commands
+    subparsers = parser.add_subparsers(dest="command", help="Command to run")
+    
+    # Main server command
+    server_parser = subparsers.add_parser("serve", help="Run the main server")
+    server_parser.add_argument(
+        "--host", default="0.0.0.0", help="Bind host for the server"
+    )
+    server_parser.add_argument(
+        "--port", type=int, default=10300, help="Bind port for the server"
+    )
+    server_parser.add_argument(
+        "--uri",
+        required=True,
+        help="unix:// or tcp://"
+    )
+    server_parser.add_argument(
+        "--homeassistant-url",
+        default=os.environ.get("HOME_ASSISTANT_URL"),
+        help="URL of Home Assistant instance"
+    )
+    server_parser.add_argument(
+        "--homeassistant-token",
+        default=os.environ.get("HOME_ASSISTANT_TOKEN"),
+        help="Long-lived access token for Home Assistant"
+    )
+    server_parser.add_argument(
         "--model",
         required=True,
         help="Name of faster-whisper model to use",
     )
-    parser.add_argument(
-        "--uri",
-        required=True,
-        help="unix:// or tcp://",
-    )
-    parser.add_argument(
+    server_parser.add_argument(
         "--data-dir",
         required=True,
         action="append",
         help="Data directory to check for downloaded models",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--model-dir",
         required=True,
         help="Directory to download/load whisper models",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--device",
         default="cpu",
         choices=["cpu", "cuda", "auto"],
         help="Device to use for inference (default: cpu, cuda, auto)",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--cpu-threads",
         type=int,
         default=0,
         help="Number of CPU threads to use for inference in case of CPU device (default: 0, which means all available threads)",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--language",
         help="Default language to set for transcription",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--compute-type",
         default="default",
         help="Compute type (default, auto, int8, int_float32, int8_float16, int8_bfloat16, int16, float16, float32, bfloat16)",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--beam-size",
         type=int,
         default=5,
         help="Size of beam during decoding",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--initial-prompt",
         help="Optional text to provide as a prompt for the first window",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--local-files-only",
         action="store_true",
         help="Don't check HuggingFace hub for updates every time",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--model-type",
         default="ct2",
         choices=["ct2", "distil", "transformers", "convert"],
         help="model type to use (ct2[faster-whisper], distil, transformers, convert[convert transformers model to CTranslate2 format]). default: ct2",
     )
     #
-    parser.add_argument(
+    server_parser.add_argument(
         "--debug",
         action="store_true",
         help="Log DEBUG messages",
     )
-    parser.add_argument(
+    server_parser.add_argument(
         "--log-format",
         default=logging.BASIC_FORMAT,
         help="Format for log messages",
     )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=__version__,
-        help="Print version and exit",
+    
+    # API server command
+    api_parser = subparsers.add_parser("api", help="Run the API server")
+    api_parser.add_argument(
+        "--host", default="0.0.0.0", help="Bind host for the API server"
     )
-    args = parser.parse_args()
+    api_parser.add_argument(
+        "--port", type=int, default=8000, help="Bind port for the API server"
+    )
+    api_parser.add_argument(
+        "--model", 
+        type=Path,
+        default=Path("models/jamspell.bin"),
+        help="Path to JamSpell model file"
+    )
+    api_parser.add_argument(
+        "--alphabet",
+        type=Path,
+        default=Path("models/alphabet.txt"),
+        help="Path to alphabet file"
+    )
+    
+    # Common arguments
+    for sub_parser in [server_parser, api_parser]:
+        sub_parser.add_argument(
+            "--version",
+            action="version",
+            version=__version__,
+            help="Print version and exit",
+        )
+    
+    return parser.parse_args()
 
+async def main() -> None:
+    """Run main entry point."""
+    args = parse_args()
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format=args.log_format,
+        stream=sys.stderr,
+    )
+    
+    if args.command == "api":
+        # Run API server
+        _LOGGER.info("Starting API server on %s:%s", args.host, args.port)
+        run_api_server(
+            host=args.host,
+            port=args.port,
+            model_path=args.model,
+            alphabet_path=args.alphabet
+        )
+        return
+    
+    # Default to server command for backward compatibility
+    if not hasattr(args, 'uri'):
+        _LOGGER.error("URI is required for server command")
+        sys.exit(1)
+    
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO, format=args.log_format
     )
@@ -119,11 +198,36 @@ async def main() -> None:
         # Whisper does not understand "auto"
         args.language = None
 
-    hf_token = None
-    if os.getenv("HUGGINGFACE_HUB_TOKEN"):
-        hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
-    elif os.getenv("HF_TOKEN"):
-        hf_token = os.getenv("HF_TOKEN")
+    # Get required tokens from environment
+    hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN") or os.getenv("HF_TOKEN")
+    ha_token = os.getenv("HA_TOKEN")
+    debug_mode = os.getenv("DEBUG", "").lower() in ("1", "true", "yes")
+    
+    # Set up debug logging if enabled
+    debug_logger = None
+    if debug_mode:
+        from .debug import setup_debug_logging
+        debug_logger = setup_debug_logging(debug=True)
+    
+    # Set up Home Assistant client if token is available
+    hass_client = None
+    if ha_token:
+        hass_url = os.getenv("HOME_ASSISTANT_URL", "http://homeassistant:8123")
+        hass_client = HomeAssistantClient(hass_url, ha_token)
+        _LOGGER.info("Home Assistant client initialized")
+        
+        # Log entities if debug mode is enabled
+        if debug_logger:
+            try:
+                _LOGGER.info("Fetching entities for debugging...")
+                await hass_client.get_entities(debug_logger=debug_logger)
+            except Exception as e:
+                _LOGGER.warning("Failed to fetch entities for debugging: %s", e)
+    else:
+        _LOGGER.warning(
+            "HA_TOKEN environment variable not set. "
+            "Home Assistant integration will be disabled."
+        )
 
 
     wyoming_info = Info(
