@@ -61,16 +61,6 @@ jobs:
         - name: Build
           run: python -m build
 
-        - name: Bump version
-          if: env.PUSH_IMAGE == 'true'
-          id: bump
-          uses: callowayproject/bump-my-version@master
-          env:
-            BUMPVERSION_TAG: "true"
-          with:
-            args: --destination pyproject.toml ${{ inputs.bump-type }}
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-
         - name: Check
           if: steps.bump.outputs.bumped == 'true'
           run: |
