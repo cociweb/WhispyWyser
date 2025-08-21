@@ -16,6 +16,7 @@ from wyoming.server import AsyncServer
 
 from . import __version__
 from .wfw.handler import FasterWhisperEventHandler
+
 from .api import run_api_server
 from .homeassistant.client import HomeAssistantClient
 from .homeassistant.models import Things
@@ -56,6 +57,7 @@ def parse_args() -> argparse.Namespace:
         help="Long-lived access token for Home Assistant"
     )
     server_parser.add_argument(
+
         "--model",
         required=True,
         help="Name of faster-whisper model to use",

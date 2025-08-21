@@ -1,11 +1,15 @@
+
 # Build stage
 ARG BASEIMAGE
 FROM ${BASEIMAGE} AS builder
 
+
 ARG BASE_TYPE
 ENV BASE_TYPE=${BASE_TYPE}
 
+
 # Install build dependencies
+
 RUN apt-get update && \
     if [ "$BASE_TYPE" = "cuda" ]; then \
       apt-get install -y --no-install-recommends \
@@ -17,6 +21,7 @@ RUN apt-get update && \
     else \
       apt-get install -y --no-install-recommends \
         build-essential \
+
         python3-dev \
         python3-pip \
         netcat-traditional; \
@@ -85,5 +90,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 LABEL org.opencontainers.image.source="https://github.com/cociweb/WhispyWyser"
 
 EXPOSE 10300
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["python3", "-m", "whispywyser.cli"]
+
