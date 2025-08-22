@@ -97,11 +97,11 @@ jobs:
             base_type: cuda
           - arch: aarch64
             platform: linux/arm64/v8
-            baseimage: python:3.9-slim-bookworm
+            baseimage: python:3.11-slim-bookworm
             base_type: cpu
           - arch: amd64
             platform: linux/amd64
-            baseimage: python:3.9-slim-bookworm
+            baseimage: python:3.11-slim-bookworm
             base_type: cpu
 
     steps:
