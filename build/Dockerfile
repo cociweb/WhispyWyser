@@ -65,7 +65,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 RUN git clone --recursive https://github.com/bakwc/JamSpell.git /tmp/JamSpell && \
     cd /tmp/JamSpell && \
     mkdir build && cd build && \
-    cmake .. && make && make install && \
+    cmake .. && make && \
     cd .. && pip install .
 
 # Install API dependencies
