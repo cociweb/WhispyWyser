@@ -14,6 +14,7 @@ RUN apt-get update && \
     if [ "$BASE_TYPE" = "cuda" ]; then \
       apt-get install -y --no-install-recommends \
         build-essential \
+        swig \
         python3 \
         python3-dev \
         python3-pip \
@@ -21,7 +22,7 @@ RUN apt-get update && \
     else \
       apt-get install -y --no-install-recommends \
         build-essential \
-
+        swig \
         python3-dev \
         python3-pip \
         netcat-traditional; \
