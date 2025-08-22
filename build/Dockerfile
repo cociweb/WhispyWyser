@@ -24,6 +24,8 @@ RUN apt-get update && \
         python3-venv \
         locales \
         locales-all \
+        ffmpeg \
+        libsndfile1 \
         netcat-traditional; \
     else \
       apt-get install -y --no-install-recommends \
@@ -37,6 +39,8 @@ RUN apt-get update && \
         python3-venv \
         locales \
         locales-all \
+        ffmpeg \
+        libsndfile1 \
         netcat-traditional; \
     fi
 
@@ -79,18 +83,18 @@ RUN pip3 install --no-cache-dir -U --upgrade wyoming faster-whisper
 FROM ${BASEIMAGE}
 
 # Install runtime dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        python3 \
-        python3-pip \
-        ffmpeg \
-        libsndfile1 \
-        netcat-traditional && \
-    rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && \
+#    apt-get install -y --no-install-recommends \
+#        python3 \
+#        python3-pip \
+#        ffmpeg \
+#        libsndfile1 \
+#        netcat-traditional && \
+RUN rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder
-COPY --from=builder /usr/local/lib/python3.11/dist-packages /usr/local/lib/python3.11/dist-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+#COPY --from=builder /usr/local/lib/python3.11/dist-packages /usr/local/lib/python3.11/dist-packages
+#COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 WORKDIR /app
