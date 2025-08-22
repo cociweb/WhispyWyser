@@ -47,22 +47,22 @@ RUN apt-get update && \
 
 RUN locale-gen
 
-RUN python3 -m venv myenv \
+RUN py -3.11 -m venv myenv \
     && . ./myenv/bin/activate
 
 
 
 RUN [ ! -f /usr/lib/python3.11/EXTERNALLY-MANAGED ] || rm -f /usr/lib/python3.11/EXTERNALLY-MANAGED
 
-RUN pip3 install --no-cache-dir -U  --upgrade pip
-RUN pip3 install --no-cache-dir -U \
+RUN py -3.11 -m pip install --no-cache-dir -U  --upgrade pip
+RUN py -3.11 -m pip install --no-cache-dir -U \
         setuptools \
         wheel
 
 # Copy and install requirements
 WORKDIR /app
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN py -3.11 -m pip install --no-cache-dir -r requirements.txt
 
 
 # Clone and build JamSpell
@@ -74,10 +74,10 @@ RUN git clone --recursive https://github.com/bakwc/JamSpell.git /tmp/JamSpell &&
 
 # Install API dependencies
 COPY requirements-api.txt .
-RUN pip3 install --no-cache-dir -r requirements-api.txt
+RUN py -3.11 -m pip install --no-cache-dir -r requirements-api.txt
 
 # Install Wyoming and faster-whisper
-RUN pip3 install --no-cache-dir -U --upgrade wyoming faster-whisper
+RUN py -3.11 -m pip install --no-cache-dir -U --upgrade wyoming faster-whisper
 
 # Runtime stage
 FROM ${BASEIMAGE}
@@ -101,7 +101,7 @@ WORKDIR /app
 COPY . .
 
 # Install the package in development mode
-RUN pip3 install -e .
+RUN py -3.11 -m pip install -e .
 
 # Create directories for models and data
 RUN mkdir -p /data/models /data/jamspell
@@ -126,5 +126,5 @@ LABEL org.opencontainers.image.source="https://github.com/cociweb/WhispyWyser"
 EXPOSE 10300
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["python3", "-m", "whispywyser.cli"]
+CMD ["py", "-3.11", "-m", "whispywyser.cli"]
 
