@@ -13,6 +13,9 @@ ENV BASE_TYPE=${BASE_TYPE}
 RUN apt-get update && \
     if [ "$BASE_TYPE" = "cuda" ]; then \
       apt-get install -y --no-install-recommends \
+        git \
+        cmake \
+        wget \
         build-essential \
         swig \
         python3 \
@@ -24,6 +27,9 @@ RUN apt-get update && \
         netcat-traditional; \
     else \
       apt-get install -y --no-install-recommends \
+        git \
+        cmake \
+        wget \
         build-essential \
         swig \
         python3-dev \
@@ -51,6 +57,14 @@ RUN pip3 install --no-cache-dir -U \
 WORKDIR /app
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
+
+
+# Clone and build JamSpell
+RUN git clone --recursive https://github.com/bakwc/JamSpell.git /tmp/JamSpell && \
+    cd /tmp/JamSpell && \
+    mkdir build && cd build && \
+    cmake .. && make && make install && \
+    cd .. && pip install .
 
 # Install API dependencies
 COPY requirements-api.txt .
