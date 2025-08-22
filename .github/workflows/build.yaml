@@ -11,6 +11,11 @@ on:
       - 'V*.*.*'
       - '*.*.*'
   workflow_dispatch:
+    inputs:
+      bump-type:
+        description: 'Type of version bump (major, minor, patch)'
+        required: false
+        default: 'patch'
   pull_request:
     branches:
       - 'main'
