@@ -18,6 +18,9 @@ RUN apt-get update && \
         python3 \
         python3-dev \
         python3-pip \
+        python-venv \
+        locales \
+        locales-all \
         netcat-traditional; \
     else \
       apt-get install -y --no-install-recommends \
@@ -25,12 +28,22 @@ RUN apt-get update && \
         swig \
         python3-dev \
         python3-pip \
+        python3-venv \
+        locales \
+        locales-all \
         netcat-traditional; \
     fi
 
-# Upgrade pip and install build tools
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir --upgrade \
+
+RUN locale-gen
+
+RUN python3 -m venv myenv \
+    && . ./myenv/bin/activate
+
+RUN rm /usr/lib/python3.11/EXTERNALLY-MANAGED
+
+RUN pip3 install --no-cache-dir -U  --upgrade pip
+RUN pip3 install --no-cache-dir -U \
         setuptools \
         wheel
 
