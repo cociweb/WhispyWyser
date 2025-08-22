@@ -80,7 +80,7 @@ RUN py -3.11 -m pip install --no-cache-dir -r requirements-api.txt
 RUN py -3.11 -m pip install --no-cache-dir -U --upgrade wyoming faster-whisper
 
 # Runtime stage
-FROM ${BASEIMAGE}
+#FROM ${BASEIMAGE}
 
 # Install runtime dependencies
 #RUN apt-get update && \
