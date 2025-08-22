@@ -46,7 +46,9 @@ RUN locale-gen
 RUN python3 -m venv myenv \
     && . ./myenv/bin/activate
 
-RUN rm /usr/lib/python3.11/EXTERNALLY-MANAGED
+
+
+RUN [ ! -f /usr/lib/python3.11/EXTERNALLY-MANAGED ] || rm -f /usr/lib/python3.11/EXTERNALLY-MANAGED
 
 RUN pip3 install --no-cache-dir -U  --upgrade pip
 RUN pip3 install --no-cache-dir -U \
