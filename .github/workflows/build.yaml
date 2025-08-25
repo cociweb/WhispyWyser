@@ -20,23 +20,54 @@ on:
     branches:
       - 'main'
 
+permissions:
+  contents: write
+  packages: write
+
+
+jobs:
+name: Build and Publish
+
+on:
+## Trigger on pushes to main and tags with vX.X.X, and allow manual dispatch, we will publish images, otherwise just build.
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*.*.*'
+      - 'V*.*.*'
+      - '*.*.*'
+  workflow_dispatch:
+    inputs:
+      bump-type:
+        description: 'Type of version bump (major, minor, patch)'
+        required: false
+        default: 'patch'
+  pull_request:
+    branches:
+      - 'main'
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   decision:
     runs-on: ubuntu-latest
+    outputs:
+      push_image: ${{ steps.decide.outputs.push_image }}
     steps:
       - name: Decide push or load
         id: decide
         run: |
           # Default: do not push
-          PUSH_IMAGE=false
+          push_image=false
           if [[ "${GITHUB_EVENT_NAME}" == "push" && ( "${GITHUB_REF}" == "refs/heads/main" || "${GITHUB_REF_TYPE}" ==  "tag" ) ]] || \
              [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${GITHUB_REF}" == "refs/heads/main" ]] || \
              [[ "${GITHUB_EVENT_NAME}" == "pull_request" && "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            echo "PUSH_IMAGE=true" >> $GITHUB_ENV
-          else
-            echo "PUSH_IMAGE=false" >> $GITHUB_ENV
+            push_image=true
           fi
+          echo "push_image=${push_image}" >> "$GITHUB_OUTPUT"
   deploy:
     needs: decision
     runs-on: ubuntu-latest
@@ -73,8 +104,8 @@ jobs:
           run: |
             echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
 
-        - name: Publish
-          if: env.PUSH_IMAGE == 'true'
+        - name: Publish to PyPI
+          if: needs.decision.outputs.push_image == 'true'
           env:
               TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
               TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
@@ -146,4 +177,4 @@ jobs:
             ${{ env.IMAGE_NAME }}
             ${{ env.IMAGE_NAME }}:latest
             ${{ github.event_name == 'push' && (github.ref_type == 'tag') && format('{0}:{1}', env.IMAGE_NAME, github.ref_name) || '' }}
-          push: ${{ env.PUSH_IMAGE == 'true' }}
+          push: ${{ needs.decision.outputs.push_image == 'true' }}
