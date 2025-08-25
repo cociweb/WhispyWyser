@@ -20,6 +20,7 @@ RUN apt-get install -y --no-install-recommends \
             git \
             cmake \
             wget \
+            curl \
             build-essential \
             swig \
             python3-dev \
@@ -48,11 +49,21 @@ RUN python3 -m pip install --no-cache-dir -U \
 WORKDIR /app
 
 # Install requirements based on build type
-COPY requirements*.txt .
 RUN if [ "$BASE_TYPE" = "cpu" ]; then \
-      python3 -m pip install --no-cache-dir -r requirements_cpu.txt; \
+        pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cpu; \
     else \
-      python3 -m pip install --no-cache-dir -r requirements_cuda.txt; \
+        pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu124; \
+    fi
+
+
+COPY requirements*.txt .
+
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
+
+RUN if [ "$BASE_TYPE" = "cpu" ]; then \
+        python3 -m pip install --no-cache-dir -r requirements_cpu.txt; \
+    else \
+        python3 -m pip install --no-cache-dir -r requirements_cuda.txt; \
     fi
 
 # Clone and build JamSpell
@@ -66,6 +77,13 @@ RUN git clone --recursive https://github.com/bakwc/JamSpell.git /tmp/JamSpell &&
 
 
 RUN rm -rf /var/lib/apt/lists/*
+
+RUN apt-get purge -y --auto-remove \
+        git \
+        cmake \
+        wget \
+        build-essential \
+
 
 # Copy installed packages from builder
 #COPY --from=builder /usr/local/lib/python3.11/dist-packages /usr/local/lib/python3.11/dist-packages
