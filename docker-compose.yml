@@ -1,4 +1,13 @@
 version: '3.7'
+
+# Environment variables (set in .env file or docker-compose.override.yml)
+# Required:
+# - HA_TOKEN=your_long_lived_token_here
+# - HOME_ASSISTANT_URL=http://your-ha-instance:8123
+# Optional:
+# - HF_TOKEN=your_huggingface_token_here
+
+
 services:
   whispywyser-gpu:
     container_name: whispywyser
@@ -7,20 +16,22 @@ services:
       - 10300:10300
     volumes:
       - whispywyser_data:/data
-    restart: always
+    restart: unless-stopped
     command: >
       --uri 'tcp://0.0.0.0:10300'
       --data-dir '/data'
       --model-dir '/data/models'
-      --model 'openai/whisper-large-v3
+      --model 'openai/whisper-large-v3'
       --model-type 'transformers'
       --device 'cuda'
       --compute-type 'float32'
       --language 'en'
       --beam-size '5'
-      --initial-prompt "This is a home automation system, controlling and querying devices. I can interpret the following actions: Controlling lights and switches: turning on, off, dimming. Starting and stopping devices. Pausing and stopping media playback. Adjusting settings for water heaters, heating, and air conditioning modes and temperatures. Managing irrigation zones and external weather conditions such as temperature, humidity, precipitation amount, wind strength, and direction.""
+      --initial-prompt 'This is a home automation system, controlling and querying devices. I can interpret the following actions: Controlling lights and switches, turning on, off, dimming. Starting and stopping devices. Pausing and stopping media playback. Adjusting settings for water heaters, heating, and air conditioning modes and temperatures. Managing irrigation zones and external weather conditions such as temperature, humidity, precipitation amount, wind strength, and direction.'
     environment:
-      - HF_TOKEN="hf_yourverysecretaccesstoken"
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HA_TOKEN=${HA_TOKEN:-}
+      - HOME_ASSISTANT_URL=${HOME_ASSISTANT_URL:-http://homeassistant:8123}
     deploy:
       resources:
         reservations:
@@ -28,6 +39,12 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10300/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   whispywyser-cpu:
     container_name: whispywyser
     image: ghcr.io/cociweb/whispywyser_amd64-cpu:latest
@@ -35,7 +52,7 @@ services:
       - 10300:10300
     volumes:
       - whispywyser_data:/data
-    restart: always
+    restart: unless-stopped
     command: >
       --uri 'tcp://0.0.0.0:10300'
       --data-dir '/data'
@@ -47,10 +64,16 @@ services:
       --compute-type 'default'
       --language 'en'
       --beam-size '5'
-      --initial-prompt "This is a home automation system, controlling and querying devices. I can interpret the following actions: Controlling lights and switches: turning on, off, dimming. Starting and stopping devices. Pausing and stopping media playback. Adjusting settings for water heaters, heating, and air conditioning modes and temperatures. Managing irrigation zones and external weather conditions such as temperature, humidity, precipitation amount, wind strength, and direction.""
+      --initial-prompt 'This is a home automation system, controlling and querying devices. I can interpret the following actions: Controlling lights and switches, turning on, off, dimming. Starting and stopping devices. Pausing and stopping media playback. Adjusting settings for water heaters, heating, and air conditioning modes and temperatures. Managing irrigation zones and external weather conditions such as temperature, humidity, precipitation amount, wind strength, and direction.'
     environment:
-#      - OMP_NUM_THREADS=4 # Uncomment if you want to set the number of cpu-threads, other than default 0
-      - HF_TOKEN="hf_yourverysecretaccesstoken"
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HA_TOKEN=${HA_TOKEN:-}
+      - HOME_ASSISTANT_URL=${HOME_ASSISTANT_URL:-http://homeassistant:8123}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10300/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     deploy:
       resources:
         limits:
