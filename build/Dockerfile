@@ -1,10 +1,10 @@
 
 # Build stage
-ARG BASEIMAGE
+ARG BASEIMAGE=python:3.11-slim-bookworm
 FROM ${BASEIMAGE} AS builder
 
 
-ARG BASE_TYPE
+ARG BASE_TYPE=cpu
 ENV BASE_TYPE=${BASE_TYPE}
 
 

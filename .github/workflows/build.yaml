@@ -21,20 +21,35 @@ on:
       - 'main'
 
 
+permissions:
+  contents: write
+  packages: write
+
+
 jobs:
   decision:
     runs-on: ubuntu-latest
+    outputs:
+      push_image: ${{ steps.decide.outputs.push_image }}
     steps:
       - name: Decide push or load
         id: decide
         run: |
           # Default: do not push
-          PUSH_IMAGE=false
-          if [[ "${{ github.event_name }}" == "push" && ( "${{ github.ref_name }}" == "refs/heads/main" || "${{ github.ref_type }}" ==  "tag" ) ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.ref_name }}" == "refs/heads/main" ]] || [[ "${{ github.event_name }}" == "pull_request" && "${{ github.ref_name }}" == "refs/heads/main" ]]; then
-            echo "PUSH_IMAGE=true" >> $GITHUB_ENV
-          else
-            echo "PUSH_IMAGE=false" >> $GITHUB_ENV
+          push_image=false
+          if [[ "${GITHUB_EVENT_NAME}" == "push" && ( "${GITHUB_REF}" == "refs/heads/main" || "${GITHUB_REF_TYPE}" ==  "tag" ) ]] || \
+             [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${GITHUB_REF}" == "refs/heads/main" ]] || \
+             [[ "${GITHUB_EVENT_NAME}" == "pull_request" && "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            push_image=true
           fi
+          echo "push_image=${push_image}" >> "$GITHUB_OUTPUT"
+      - name: Debug decision
+        run: |
+          echo "GITHUB_EVENT_NAME=${GITHUB_EVENT_NAME}"
+          echo "GITHUB_REF=${GITHUB_REF}"
+          echo "GITHUB_REF_TYPE=${GITHUB_REF_TYPE}"
+          echo "push_image (output)=${{ steps.decide.outputs.push_image }}"
+
   deploy:
     needs: decision
     runs-on: ubuntu-latest
@@ -71,8 +86,8 @@ jobs:
           run: |
             echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
 
-        - name: Publish
-          if: env.PUSH_IMAGE == 'true'
+        - name: Publish to PyPI
+          if: needs.decision.outputs.push_image == 'true'
           env:
               TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
               TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
@@ -144,4 +159,4 @@ jobs:
             ${{ env.IMAGE_NAME }}
             ${{ env.IMAGE_NAME }}:latest
             ${{ github.event_name == 'push' && (github.ref_type == 'tag') && format('{0}:{1}', env.IMAGE_NAME, github.ref_name) || '' }}
-          push: ${{ env.PUSH_IMAGE == 'true' }}
+          push: ${{ needs.decision.outputs.push_image == 'true' }}
