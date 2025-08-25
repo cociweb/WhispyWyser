@@ -43,6 +43,13 @@ jobs:
             push_image=true
           fi
           echo "push_image=${push_image}" >> "$GITHUB_OUTPUT"
+      - name: Debug decision
+        run: |
+          echo "GITHUB_EVENT_NAME=${GITHUB_EVENT_NAME}"
+          echo "GITHUB_REF=${GITHUB_REF}"
+          echo "GITHUB_REF_TYPE=${GITHUB_REF_TYPE}"
+          echo "push_image (output)=${{ steps.decide.outputs.push_image }}"
+
   deploy:
     needs: decision
     runs-on: ubuntu-latest

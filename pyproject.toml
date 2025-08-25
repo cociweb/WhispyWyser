@@ -6,23 +6,24 @@ dynamic = [
 ]
 description = "The WhispyWyser project is designed to provide a flexible and efficient implementation of Voice Assistant for Home Assistant based on Faster Whisper and Wyoming protocol. This project supports both CPU and CUDA architectures, allowing for optimized performance based on the available hardware."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 keywords = [
     "WhispyWyser",
 ]
-license = {text = "MIT License"}
+license = "MIT"
 authors = [
   {name = "cociweb"},
 ]
 classifiers = [
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: End Users/Desktop",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
+    "Natural Language :: Hungarian",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 [project.entry-points."console_scripts"]
