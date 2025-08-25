@@ -72,6 +72,10 @@ max-line-length = 88
 
 [project.urls]
 Homepage = "https://github.com/cociweb/WhispyWyser"
+Documentation = "https://cociweb.github.io/WhispyWyser"
+Repository = "https://github.com/cociweb/WhispyWyser.git"
+Issues = "https://github.com/cociweb/WhispyWyser/issues"
+Changelog = "https://github.com/cociweb/WhispyWyser/releases"
 
 [build-system]
 requires = ["setuptools>=64", "setuptools_scm>=8"]
