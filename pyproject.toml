@@ -1,6 +1,6 @@
 [project]
 name = "WhispyWyser"
-version = "v0.0.16"
+version = "0.0.16"
 dynamic = [
     "dependencies",
 ]
@@ -48,7 +48,7 @@ universal = true
 
 
 [tool.bumpversion]
-current_version = "v0.0.16"
+current_version = "0.0.16"
 commit = true
 tag = true
 
