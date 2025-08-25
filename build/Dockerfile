@@ -76,14 +76,13 @@ RUN git clone --recursive https://github.com/bakwc/JamSpell.git /tmp/JamSpell &&
 
 
 
-RUN rm -rf /var/lib/apt/lists/*
 
 RUN apt-get purge -y --auto-remove \
         git \
         cmake \
         wget \
-        build-essential \
-
+        build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder
 #COPY --from=builder /usr/local/lib/python3.11/dist-packages /usr/local/lib/python3.11/dist-packages
