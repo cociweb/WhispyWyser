@@ -13,7 +13,7 @@ ENV BASE_TYPE=${BASE_TYPE}
 RUN apt-get update && \
     if [ "$BASE_TYPE" = "cuda" ]; then \
         apt-get install -y --no-install-recommends \
-            python3 \
+            python3; \
     fi
 
 RUN apt-get install -y --no-install-recommends \
