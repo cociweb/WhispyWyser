@@ -12,6 +12,13 @@ import jamspell
 _LOGGER = logging.getLogger(__name__)
 
 @dataclass
+class SpellCheckRequest:
+    """Request for spell checking."""
+    text: str
+    language: str = "en"
+
+
+@dataclass
 class SpellCheckResponse:
     """Response from spell checking."""
     original: str
