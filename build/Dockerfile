@@ -12,47 +12,32 @@ ENV BASE_TYPE=${BASE_TYPE}
 
 RUN apt-get update && \
     if [ "$BASE_TYPE" = "cuda" ]; then \
-      apt-get install -y --no-install-recommends \
-        git \
-        cmake \
-        wget \
-        build-essential \
-        swig \
-        python3 \
-        python3-dev \
-        python3-pip \
-        python3-venv \
-        locales \
-        locales-all \
-        ffmpeg \
-        libsndfile1 \
-        netcat-traditional; \
-    else \
-      apt-get install -y --no-install-recommends \
-        git \
-        cmake \
-        wget \
-        build-essential \
-        swig \
-        python3-dev \
-        python3-pip \
-        python3-venv \
-        locales \
-        locales-all \
-        ffmpeg \
-        libsndfile1 \
-        netcat-traditional; \
+        apt-get install -y --no-install-recommends \
+            python3 \
     fi
 
+RUN apt-get install -y --no-install-recommends \
+            git \
+            cmake \
+            wget \
+            build-essential \
+            swig \
+            python3-dev \
+            python3-pip \
+            python3-venv \
+            locales \
+            locales-all \
+            ffmpeg \
+            libsndfile1 \
+            netcat-traditional
 
 RUN locale-gen
 
 RUN python3 -m venv myenv \
     && . ./myenv/bin/activate
-
-
-
 RUN [ ! -f /usr/lib/python3.11/EXTERNALLY-MANAGED ] || rm -f /usr/lib/python3.11/EXTERNALLY-MANAGED
+
+
 
 RUN python3 -m pip install --no-cache-dir -U  --upgrade pip
 RUN python3 -m pip install --no-cache-dir -U \
@@ -61,35 +46,25 @@ RUN python3 -m pip install --no-cache-dir -U \
 
 # Copy and install requirements
 WORKDIR /app
-COPY requirements.txt .
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
+# Install requirements based on build type
+COPY requirements*.txt .
+RUN if [ "$BASE_TYPE" = "cpu" ]; then \
+      python3 -m pip install --no-cache-dir -r requirements_cpu.txt; \
+    else \
+      python3 -m pip install --no-cache-dir -r requirements_cuda.txt; \
+    fi
 
 # Clone and build JamSpell
 RUN git clone --recursive https://github.com/bakwc/JamSpell.git /tmp/JamSpell && \
     cd /tmp/JamSpell && \
     mkdir build && cd build && \
-    cmake .. && make && \
-    cd .. && pip install .
+    cmake .. && make -j$(nproc) && \
+    cd .. && pip install . && \
+    cd / && rm -rf /tmp/JamSpell
 
-# Install API dependencies
-COPY requirements-api.txt .
-RUN python3 -m pip install --no-cache-dir -r requirements-api.txt
 
-# Install Wyoming and faster-whisper
-RUN python3 -m pip install --no-cache-dir -U --upgrade wyoming faster-whisper
 
-# Runtime stage
-#FROM ${BASEIMAGE}
-
-# Install runtime dependencies
-#RUN apt-get update && \
-#    apt-get install -y --no-install-recommends \
-#        python3 \
-#        python3-pip \
-#        ffmpeg \
-#        libsndfile1 \
-#        netcat-traditional && \
 RUN rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages from builder

@@ -1,0 +1,11 @@
+# Include common requirements
+-r requirements.txt
+
+# CPU-specific ML dependencies
+faster-whisper>=1.1.1,<2
+ctranslate2>=4.6.0,<5
+transformers>=4.52.4,<5
+wyoming>=1.6.1,<2
+hassil>=3.0.1,<4
+torch>=2.0.0,<3.0.0 --extra-index-url https://download.pytorch.org/whl/cpu
+torchvision>=0.15.0,<1.0.0 --extra-index-url https://download.pytorch.org/whl/cpu
