@@ -1,3 +1,3 @@
 """Wyoming server for WhispyWyser."""
-__version__ = "0.0.25"
+__version__ = "0.0.26"
 __all__ = ["__version__"]
