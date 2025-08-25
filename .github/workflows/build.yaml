@@ -94,7 +94,7 @@ jobs:
           run: twine upload dist/*
 
   build:
-    needs: deploy
+    needs: [decision, deploy]
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -144,6 +144,11 @@ jobs:
           REPO_LC="${REPO,,}"
           echo "REPO_LC=${REPO_LC}" >> $GITHUB_ENV
           echo "IMAGE_NAME=ghcr.io/${REPO_LC}_${{ matrix.arch }}-${{ matrix.base_type }}" >> $GITHUB_ENV
+
+      - name: Debug push flag and tags
+        run: |
+          echo "push_image from decision: ${{ needs.decision.outputs.push_image }}"
+          echo "IMAGE_NAME: ${{ env.IMAGE_NAME }}"
 
       - name: Build and (optionally) push Docker image
         uses: docker/build-push-action@v6
