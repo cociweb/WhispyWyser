@@ -2,6 +2,7 @@
 name-template: "$RESOLVED_VERSION"
 tag-template: "$RESOLVED_VERSION"
 version-template: "v$MAJOR.$MINOR.$PATCH"
+target-commitish: main
 categories:
   - title: "⚠ Breaking Changes"
     labels:
