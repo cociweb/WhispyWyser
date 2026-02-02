@@ -1,6 +1,6 @@
 # CPU-specific ML dependencies
 faster-whisper>=1.1.1,<2
 ctranslate2>=4.6.0,<5
-transformers>=4.52.4,<5
+transformers>=4.52.4,<6
 wyoming>=1.6.1,<2
 hassil>=3.0.1,<4
