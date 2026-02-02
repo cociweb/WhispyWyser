@@ -1,6 +1,6 @@
 # CUDA-specific ML dependencies
 faster-whisper[cuda]>=1.1.1,<2
 ctranslate2[cuda]>=4.6.0,<5
-transformers[torch]>=4.52.4,<5
+transformers[torch]>=4.52.4,<6
 wyoming>=1.6.1,<2
 hassil>=3.0.1,<4
